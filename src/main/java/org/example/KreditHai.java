@@ -8,20 +8,29 @@ public class KreditHai {
         System.out.println("Hello world!");
     }
 
+    DatenbankSchnittstelle datenbankSchnittstelle;
+    StatistikSchnittstelle statistikSchnittstelle;
+
+    public KreditHai(DatenbankSchnittstelle datenbankSchnittstelle, StatistikSchnittstelle statistikSchnittstelle) {
+        this.datenbankSchnittstelle = datenbankSchnittstelle;
+        this.statistikSchnittstelle = statistikSchnittstelle;
+    }
+
     /**
-     * Minimum 4, maximum 12. Je höher desto schlechter.
-     * Gewährt: 4-7.
+     * Minimum 5, maximum 15. Je höher, desto schlechter.
+     * Gewährt: 5-7.
      * Berater muss dazu gerufen werden: 8-10.
-     * Abgelehnt: 11-12
+     * Abgelehnt: 11-15
      *
      * @param kreditSumme
      * @param wohnort
      * @param beruf
      * @param kundeSeit
      * @param ruecklagenInEuro
+     * @param plz
      * @return
      */
-    public int calculateBonitaet(double kreditSumme, Wohnort wohnort, Beruf beruf, LocalDate kundeSeit, double ruecklagenInEuro) {
+    public int calculateBonitaet(double kreditSumme, Wohnort wohnort, Beruf beruf, LocalDate kundeSeit, double ruecklagenInEuro, Plz plz) {
         if (kreditSumme <= 0
                 || ruecklagenInEuro <= 0
                 || wohnort == null
@@ -52,8 +61,12 @@ public class KreditHai {
             bonitaet += 3;
         }
 
+        bonitaet += datenbankSchnittstelle.getBonitaet(plz);
+
         bonitaet += beruf.value;
         bonitaet += wohnort.value;
+
+        statistikSchnittstelle.setDecision(bonitaet);
 
         return bonitaet;
     }
@@ -80,4 +93,10 @@ enum Wohnort {
     Wohnort(int value) {
         this.value = value;
     }
+}
+
+enum Plz {
+    PLZ_78467,
+    PLZ_78554,
+    PLZ_10115
 }
